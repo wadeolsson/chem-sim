@@ -46,7 +46,7 @@
   - Environment sliders (temperature, pressure, EM fields).  
   - Photon source selector with wavelength presets and manual entry.  
   - Simulation controls: play/pause, step, reset, speed multiplier.  
-  - Scenario presets list and save/load buttons.
+  - Future save/load buttons for exporting/importing sandbox states.
 
 - **Inspector Panel (toggle, bottom or overlay)**  
   - Shows selected atom/molecule properties: orbital occupation, partial charges, bond partners.  

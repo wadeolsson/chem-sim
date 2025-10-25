@@ -10,7 +10,7 @@ pip install -r requirements-dev.txt
 
 ## Required Packages (v0.x)
 - `pygame` – 2D rendering and event handling for the sandbox UI.
-- `PyYAML` – configuration/schema parsing for scenario files.
+- `PyYAML` – configuration/schema parsing (test fixtures, future config tooling).
 - `pytest` – unit testing harness (schema checks, data validation).
 
 Optional (future):
@@ -21,4 +21,3 @@ Optional (future):
 - The pygame scaffold lives in `src/ui/app.py`; running `python -m src.ui.app` launches the current mock UI.
 - Install system-level SDL libraries if pygame build complains (varies by OS).
 - Keep the virtual environment activated while running ingestion scripts or tests.
-

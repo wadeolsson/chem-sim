@@ -29,7 +29,7 @@
 - **Checklist**
   - Store frequencies/energies with units (cm⁻¹, nm, eV) and conversion factors.
   - Capture intensities/oscillator strengths and experimental conditions (solvent, temperature).
-  - Provide cross-links to validation scenarios in `Tests_core_checks`.
+  - Provide cross-links to validation scenes/configurations in `Tests_core_checks`.
 
 ## Data Integrity Workflow
 1. Collect raw data into staging spreadsheets or scripts.

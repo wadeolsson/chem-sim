@@ -73,3 +73,7 @@ Notes: Extend preset library, hook loaders into save/export flow, and begin para
 v0.19 - Valence-Driven Bonding Pass
 Summary: Introduced element valence metadata (`src/chem_data.py`), valence/bond-slot tracking in `sim.py`, capture forces, and enhanced inspector readouts; bonding logic now aggressively fills duet/octet targets and water forms naturally from H+H+O. README updated accordingly with tests extended.
 Notes: Next tackle neighbor lists and UI temperature/pressure sliders to modulate the thermostat/barostat in real time.
+
+v0.20 - Sandbox-Only Workflow
+Summary: Removed the scenario loader/presets (and related UI/test hooks) so the sandbox always starts empty; control dock no longer shows scenario controls, and documentation emphasizes drag-and-drop building.
+Notes: Future save/load will return via a new export format rather than the previous preset system.

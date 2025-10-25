@@ -26,7 +26,7 @@ This document summarizes the minimum work required to deliver the initial intera
 - Provide camera controls (zoom, pan) plus timeline scrubber stub (even if playback is linear initially).
 
 ## 5. Configuration & Persistence
-- Finalize `config/template.yaml` structure; support loading/saving scenarios from/to disk (`.yaml` or JSON).
+- Finalize `config/template.yaml` structure; design future save/load format for sandbox scenes (`.yaml` or JSON).
 - Allow runtime environment tweaks (temperature, EM toggle) via config updates or UI controls.
 - Implement basic output writers (trajectory snapshots, energy log) to `output/`.
 

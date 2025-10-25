@@ -29,7 +29,6 @@ from sim import (
     SimulationSettings,
     SimulationSnapshot,
 )  # type: ignore
-from ..config_loader import load_simulation_from_yaml
 from .viewport import SandboxViewport
 from .panels import PeriodicTablePanel, ControlDockPanel, InspectorPanel
 from .controllers import SimulationController, UIController
@@ -102,12 +101,6 @@ class ChemSimApp:
             max((particle.id for particle in self.simulation.particles), default=0) + 1
         )
         self.element_metadata: Dict[str, Dict[str, Any]] = {}
-        self.scenario_paths: List[Path] = [
-            Path("config/presets/water_cluster.yaml"),
-            Path("config/presets/argon_cloud.yaml"),
-        ]
-        self.current_scenario_index: int = -1
-        self.current_scenario_label: str = "Custom"
 
     def setup(self) -> None:
         """Initialize pygame context and create root surfaces."""
@@ -157,11 +150,10 @@ class ChemSimApp:
             on_step=self._step_once,
             on_reset=self._reset_simulation,
             on_speed_change=self._on_speed_change,
-            on_cycle_scenario=self.load_next_scenario,
-            scenario_label=self.current_scenario_label,
         )
         self.inspector_panel = InspectorPanel(rect=inspector_rect, font=font)
-        self._load_initial_scenario()
+        self._rebuild_ui_controller()
+        self._latest_snapshot = self.sim_controller.snapshot()
 
     def handle_event(self, event: "pygame.event.Event") -> None:
         """Dispatch a single pygame event."""
@@ -174,8 +166,6 @@ class ChemSimApp:
                 self.sim_controller.toggle_running()
             elif event.key == pygame.K_PERIOD:
                 self.sim_controller.step(1)
-            elif event.key == pygame.K_n:
-                self.load_next_scenario()
 
         if self.ui_controller:
             self.ui_controller.handle_event(event)
@@ -232,44 +222,7 @@ class ChemSimApp:
         self.sim_controller.step(1)
 
     def _reset_simulation(self) -> None:
-        if self.current_scenario_index >= 0:
-            self.load_scenario_by_index(self.current_scenario_index)
-        else:
-            self._set_simulation(self._create_default_simulation())
-
-    def _load_initial_scenario(self) -> None:
-        if self.scenario_paths:
-            try:
-                self.load_scenario_by_index(0)
-                return
-            except Exception as exc:  # pragma: no cover - logging only
-                print(f"Failed to load scenario: {exc}")
-        self._rebuild_ui_controller()
-        if self.sim_controller:
-            self._latest_snapshot = self.sim_controller.snapshot()
-
-    def load_next_scenario(self) -> None:
-        if not self.scenario_paths:
-            return
-        next_index = (self.current_scenario_index + 1) % len(self.scenario_paths)
-        self.load_scenario_by_index(next_index)
-
-    def load_scenario_by_index(self, index: int) -> None:
-        if not self.scenario_paths:
-            return
-        index %= len(self.scenario_paths)
-        scenario_path = self._resolve_path(self.scenario_paths[index])
-        if not scenario_path.exists():
-            raise FileNotFoundError(f"Scenario file {scenario_path} not found")
-        bundle = load_simulation_from_yaml(
-            scenario_path,
-            element_metadata=self.element_metadata,
-        )
-        self.current_scenario_label = bundle.metadata.get("name", scenario_path.stem)
-        self.current_scenario_index = index
-        self._set_simulation(bundle.simulation)
-        if self.control_panel:
-            self.control_panel.scenario_label = self.current_scenario_label
+        self._set_simulation(self._create_default_simulation())
 
     def _set_simulation(self, simulation: Simulation) -> None:
         self.simulation = simulation
@@ -297,12 +250,6 @@ class ChemSimApp:
         if self.control_panel:
             self.control_panel.is_running = self.sim_controller.is_running
             self.control_panel.speed_multiplier = self.sim_controller.speed_multiplier
-
-    def _resolve_path(self, path: Path) -> Path:
-        base = Path(__file__).resolve().parents[2]
-        if path.is_absolute():
-            return path
-        return base / path
 
     def _load_periodic_table_metadata(self) -> Tuple[List[str], Dict[str, Dict[str, Any]]]:
         """Load element symbols and metadata from the periodic table dataset."""

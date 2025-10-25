@@ -63,7 +63,7 @@ Visualization & UI Framework Plan
 - UI components:
   * `ViewportManager` handles sandbox camera transforms, object layering (atoms vs densities), and overlays (field lines, temperature maps).
   * `PeriodicTablePanel` renders element grid, highlights selections, and surfaces atomic metadata pulled from `PeriodicTable` repository.
-  * `ControlDock` hosts environment sliders (temperature, pressure, EM fields), photon source controls, and preset scenario loader.
+  * `ControlDock` hosts environment sliders (temperature, pressure, EM fields), photon source controls, and future save/load hooks for sandbox states.
   * `InspectorPanel` (toggle) displays atom/molecule analytics, spectra previews, and editing tools for electron excitation/ionization.
 - Rendering considerations:
   * Use double buffering and batched draw calls to maintain smooth visualization at MD time steps.
@@ -122,7 +122,7 @@ Data Schema & Configuration Design
 - Simulation configuration schema (`config/*.yaml`):
   * Defines system topology (atoms, initial positions/velocities), boundary conditions, selected potentials, integrator settings, thermostat targets, EM field parameters, and output cadence.
   * Includes UI layout preferences (camera, panel visibility) and logging verbosity.
-  * Supports scenario presets and batch runs via templating/parameter sweeps.
+  * Supports exporting/importing sandbox states and batch runs via templating/parameter sweeps.
 - Logging & telemetry:
   * Standardize diagnostic channels (energy drift, force magnitudes, performance metrics) with structured output (JSONL) for later analysis.
   * Provide hooks to attach profiling markers around force calculations, integrator steps, and rendering passes.
@@ -148,7 +148,7 @@ Development Backlog & Milestones
   * Implement velocity Verlet integrator, force-field plugins (LJ, Coulomb), and thermostat hooks with energy diagnostics.
   * Build neighbor list/space partitioning for efficient force evaluations; verify against tier-1 tests.
   * Connect sandbox viewport to simulation loop with minimal visualization (atoms, bonds inferred by distance).
-  * Ship initial scenario presets (argon box, water cluster) and enable save/load of configurations.
+  * Enable save/load of sandbox configurations (blank by default) so users can store interesting molecules or scenes.
 - Phase 2 (Quantum-inspired bonding)
   * Integrate orbital data loader and bonding evaluator (tight-binding/Hückel approximation).
   * Extend visualization to display orbital hybridization and charge distributions.

@@ -27,7 +27,7 @@ Cross-Layer Validation
 Test Harness Vision
 -------------------
 - Testing framework: leverage `pytest` with simulation fixtures for deterministic configuration setup and teardown.
-- Data-driven checks: read baseline scenarios from `tests/data/*.yaml` ensuring reproducibility and simplified expansion of edge cases.
+- Data-driven checks: read baseline configurations from `tests/data/*.yaml` ensuring reproducibility and simplified expansion of edge cases.
 - Performance guards: incorporate threshold tests for step throughput and GPU/CPU parity metrics to detect regressions early.
 - Visualization validation: export frames to reference directories and perform image-diff or data overlay comparisons within tolerance thresholds.
 - Continuous integration: schedule nightly suites for heavy electron dynamics tests, while running lightweight classical checks on every push.

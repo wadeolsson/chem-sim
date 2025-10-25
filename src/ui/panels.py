@@ -90,12 +90,10 @@ class ControlDockPanel:
     on_step: Callable[[], None]
     on_reset: Callable[[], None]
     on_speed_change: Callable[[float], None]
-    on_cycle_scenario: Callable[[], None]
     is_running: bool = False
     speed_multiplier: float = 1.0
     min_speed: float = 0.25
     max_speed: float = 4.0
-    scenario_label: str = "Custom"
     _button_rects: Dict[str, "pygame.Rect"] = field(default_factory=dict, init=False, repr=False)
     _slider_track: Optional["pygame.Rect"] = field(default=None, init=False, repr=False)
     _slider_handle: Optional["pygame.Rect"] = field(default=None, init=False, repr=False)
@@ -108,13 +106,10 @@ class ControlDockPanel:
         status_text = "Running" if self.is_running else "Paused"
         status_surf = self.font.render(f"Status: {status_text}", True, (230, 230, 240))
         surface.blit(status_surf, (self.rect.x + 16, self.rect.y + 16))
-        scenario_text = self.font.render(f"Scenario: {self.scenario_label}", True, (210, 210, 230))
-        surface.blit(scenario_text, (self.rect.x + 16, self.rect.y + 34))
         button_labels = [
             ("run", "Pause" if self.is_running else "Run"),
             ("step", "Step"),
             ("reset", "Reset"),
-            ("scenario", "Next Scenario"),
         ]
         self._button_rects = {}
         for idx, (key, label) in enumerate(button_labels):
@@ -155,8 +150,6 @@ class ControlDockPanel:
                             self.on_step()
                         elif key == "reset":
                             self.on_reset()
-                        elif key == "scenario":
-                            self.on_cycle_scenario()
                         return
                 if self._slider_track and self._slider_track.collidepoint(pos):
                     self._slider_drag_active = True
