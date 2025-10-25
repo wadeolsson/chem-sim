@@ -1,0 +1,32 @@
+ChemSim Critical Test Checklist
+===============================
+
+Tier 1 – Classical Dynamics
+- `test_energy_conservation_tier1`: run NVE simulation with Lennard-Jones system; verify total energy drift stays within tolerance over defined timesteps.
+- `test_thermostat_temperature_control`: apply thermostat to argon box; confirm measured temperature tracks target profile within error bounds.
+- `test_boundary_condition_consistency`: propagate particles across periodic boundaries; ensure wrapped positions maintain momentum continuity and neighbor lists update correctly.
+- `test_distance_based_bond_detection`: validate that covalent bond heuristics flag/clear bonds correctly when atom separations cross threshold limits.
+- `test_ionic_charge_transfer`: confirm metal → nonmetal proximity triggers electron donation and resulting charge adjustments.
+- `test_bonded_force_terms`: exercise harmonic bond/angle forces to ensure molecules relax toward equilibrium geometries without instability.
+
+Tier 2 – Quantum-Inspired Bonding
+- `test_orbital_overlap_bonding_rules`: position diatomic species (e.g., H2, CO); confirm bond order, length, and energy match expected approximations from orbital overlap logic.
+- `test_partial_charge_distribution`: evaluate polar molecule (e.g., H2O) and ensure computed partial charges align with reference data within tolerance.
+- `test_reaction_energy_balance`: orchestrate bond formation/breaking scenario; verify total system energy adjusts by predicted enthalpy change.
+
+Tier 3 – Dynamic Electrons
+- `test_electron_localization_vs_field`: place electron densities near nucleus with external field; ensure localization shifts track field strength quantitatively.
+- `test_ionization_threshold`: excite atom with photon input; confirm electron ejection occurs only when supplied energy exceeds ionization threshold.
+- `test_gpu_cpu_consistency`: compare electron dynamics results between GPU-accelerated and CPU reference implementations for identical seeds.
+
+Cross-Layer Validation
+- `test_data_integrity_periodic_table`: audit atomic property dataset for completeness and unit consistency before simulations run.
+- `test_visualization_physical_alignment`: verify rendered orbitals, density plots, and temperature gradients match underlying simulation data within defined tolerances.
+
+Test Harness Vision
+-------------------
+- Testing framework: leverage `pytest` with simulation fixtures for deterministic configuration setup and teardown.
+- Data-driven checks: read baseline scenarios from `tests/data/*.yaml` ensuring reproducibility and simplified expansion of edge cases.
+- Performance guards: incorporate threshold tests for step throughput and GPU/CPU parity metrics to detect regressions early.
+- Visualization validation: export frames to reference directories and perform image-diff or data overlay comparisons within tolerance thresholds.
+- Continuous integration: schedule nightly suites for heavy electron dynamics tests, while running lightweight classical checks on every push.

@@ -1,0 +1,71 @@
+v0.01 - Mission & Roadmap
+Summary: Documented core mission and multi-tier roadmap in `mission.txt`, outlining physics layers, engine components, user tooling, and phased implementation plan.
+Notes: Need to source reliable atomic/property datasets and prioritize performance profiling when tiers 2–3 are prototyped.
+
+v0.02 - Critical Test Suite Seeds
+Summary: Seeded `Tests_core_checks.txt` with tiered critical checks covering energy conservation, bonding logic, electron behavior, and data/visual integrity.
+Notes: Define quantitative tolerances and reference datasets before automating these tests; revisit after Tier 1 prototype exists.
+
+v0.03 - Architecture & Data Pipeline Blueprint
+Summary: Added system architecture blueprint and data pipeline requirements to `mission.txt` to clarify module boundaries, resource needs, and validation datasets.
+Notes: Next focus on drafting development milestones/backlog and selecting candidate datasets (NIST, OPLS/ReaxFF) for initial ingestion.
+
+v0.04 - Visualization Framework Plan
+Summary: Established `pygame`-based visualization plan in `mission.txt`, detailing sandbox/periodic-table layout, UI components, and rendering abstractions.
+Notes: Prototype viewport/periodic-table panels with mock data to validate layout before engine integration; assess performance ceilings of pygame for dense scenes.
+
+v0.05 - Development Backlog & Milestones
+Summary: Added phased backlog in `mission.txt`, covering pre-phase groundwork through advanced analytics and optimization milestones.
+Notes: Sequence near-term tasks—data pipeline scaffolding, pygame UI prototype, and test harness skeleton—as priorities for the upcoming build cycle.
+
+v0.06 - Data Schemas & Test Harness Plan
+Summary: Expanded `mission.txt` with data schema and configuration design details; outlined automated testing harness strategy in `Tests_core_checks.txt`.
+Notes: Start drafting actual JSON/YAML prototypes for datasets and configs; prepare pytest scaffolding with placeholder fixtures.
+
+v0.07 - Data & Test Scaffolding
+Summary: Created placeholder dataset/config files (`data/`, `config/`) and initial pytest scaffold (`tests/`) aligned with planned schemas.
+Notes: Populate placeholders with real values and expand tests once simulation modules land; ensure CI excludes stub outputs until logic implemented.
+
+v0.08 - Documentation Expansion
+Summary: Added `docs/data_sources.md` and `docs/ui_layout.md` to capture sourcing workflow and UI detail; cross-referenced these docs from `mission.txt`.
+Notes: Begin curating real data sources per documentation; consider drafting visualization mockups or wireframes to accompany the layout notes.
+
+v0.09 - Dataset Enrichment & Tooling
+Summary: Populated sample authoritative values in `data/` assets, added UI wireframe sketch, introduced pytest fixtures/schema checks, and stubbed `scripts/ingest_atomic_data.py`.
+Notes: Install PyYAML for config parsing tests, expand datasets beyond H/O, and iterate on ingestion script once raw sources are identified.
+
+v0.10 - First-Run Roadmap & Interaction Updates
+Summary: Documented drag-and-drop placement in `docs/ui_layout.md`, defined element coverage strategy in `docs/data_sources.md`, and drafted `docs/first_run_plan.md` outlining tasks to reach the initial runnable build.
+Notes: Follow the v0.1 checklist to prioritize engine/UI/data work; start populating periodic table entries up to Pb with provenance tags.
+
+v0.11 - Data Expansion & Engine Kickoff
+Summary: Expanded `data/periodic_table.json` with prioritized elements (H–Pb) plus placeholders, upgraded ingestion script to normalize raw datasets, added Tier-1 simulation scaffolding in `sim.py`, and tightened data tests.
+Notes: Install `pytest`/`PyYAML` to execute the new checks, calibrate force units with benchmarking, and continue populating remaining element data via the ingestion pipeline.
+
+v0.12 - pygame Rendering Scaffold
+Summary: Authored `docs/pygame_rendering.md` outlining the rendering/event-loop strategy, referenced it in `mission.txt`, and created a pygame app scaffold in `src/ui/app.py`.
+Notes: Begin implementing viewport/panel renderers once simulation outputs atoms/bonds; add dependency management for pygame in the setup workflow.
+
+v0.13 - Engine Snapshot & UI Controllers
+Summary: Added simulation snapshot structures in `sim.py`, built pygame viewport/panel/controller scaffolds (`src/ui/`), expanded the app to spawn atoms via drag-and-drop, and documented dependencies in `docs/setup_env.md` with `requirements-dev.txt`.
+Notes: Install listed packages before running tests/UI; next steps include implementing control dock interactions, bonding heuristics, and connecting real force fields for interactive demos.
+
+v0.14 - Bond Heuristics & Interactive UI
+Summary: Implemented covalent-radius-based bond detection in `sim.py`, wired control dock/inspector interactions throughout the pygame UI (`src/ui/`), and added bonding unit tests plus checklist updates.
+Notes: After installing dev requirements, run `pytest` to execute the new simulation tests; next focus on force-field calibration and richer control widgets (sliders/buttons) styling.
+
+v0.15 - Valence Visualization Hook
+Summary: Inspector panel now surfaces valence electrons, electron configuration, and oxidation states using periodic-table metadata; pygame controllers/app load full element records for contextual display.
+Notes: Extend metadata loader with additional properties (e.g., electronegativity, radii) for future overlays; consider graphical orbital previews in later tiers.
+
+v0.16 - Covalent & Ionic Bond Dynamics
+Summary: Enhanced `sim.py` with metadata-aware covalent/ionic bonding heuristics, electron sharing/transfer, phase-responsive spreading, harmonic bond/angle forces, and Berendsen-style thermostatting; updated UI force-field defaults/tests/docs accordingly.
+Notes: Next steps include tuning force constants, expanding the force-field database, and adding scenario loaders so users can configure thermostats and bonded parameters per run.
+
+v0.17 - Bonding Research Integration
+Summary: Compiled comparative research on reactive/bonded/nonbonded force models (`docs/bonding_research.md`) and expanded mission guidance with a detailed bonding & intermolecular force strategy.
+Notes: Begin sourcing parameter sets (GAFF/OPLS/ReaxFF) and wire charge equilibration plus advanced nonbonded kernels into the engine roadmap.
+
+v0.18 - Phase 1 Scenario Loader & Rendering
+Summary: Added YAML config loader (`src/config_loader.py`), sample presets (`config/presets/*`), UI scenario cycling/reset controls, ionic dashed-line rendering, and config-loader tests; simulations now start from curated presets with proper bonded visuals.
+Notes: Extend preset library, hook loaders into save/export flow, and begin parameter ingestion for broader element coverage.
