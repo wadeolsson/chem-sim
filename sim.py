@@ -23,6 +23,8 @@ import math
 import random
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
+from src.chem_data import get_valence_rule
+
 
 Vector = Tuple[float, float, float]
 
@@ -45,6 +47,7 @@ BOLTZMANN_CONSTANT_J_PER_K = 1.380_649e-23
 BOLTZMANN_CONSTANT_KJ_MOL_K = 0.008314462618
 M_S_TO_NM_FS = 1e-6
 BOND_CAPTURE_MULTIPLIER = 1.8
+CAPTURE_FORCE_K = 50.0
 
 DEFAULT_COVALENT_RADII_PM: Dict[str, float] = {
     "H": 31.0,
@@ -189,6 +192,9 @@ class Particle:
     valence_electrons: int = 0
     base_valence_electrons: int = 0
     phase: str = ""
+    bond_slots: int = 0
+    max_bond_slots: int = 0
+    valence_target: int = 0
 
 
 @dataclass
@@ -301,6 +307,9 @@ class AtomState:
     element: str
     position_nm: Vector
     velocity_nm_fs: Vector
+    valence_electrons: int
+    bond_slots: int
+    charge_e: float
 
 
 @dataclass
@@ -365,7 +374,8 @@ class Simulation:
 
     def _initialize_particle(self, particle: Particle, preserve_charge: bool = False) -> None:
         metadata = self.element_metadata.get(particle.element, {})
-        valence_meta = metadata.get("valence_electrons")
+        rule = get_valence_rule(particle.element) or {}
+        valence_meta = metadata.get("valence_electrons", rule.get("target_electrons"))
         if valence_meta is not None:
             try:
                 valence_value = int(valence_meta)
@@ -383,7 +393,12 @@ class Simulation:
             # fallback assumption for unknown elements
             particle.base_valence_electrons = particle.valence_electrons or 0
 
-        phase_meta = metadata.get("phase")
+        particle.valence_target = int(metadata.get("valence_target", rule.get("target_electrons", max(2, min(8, particle.base_valence_electrons + 4)))))
+        particle.max_bond_slots = int(metadata.get("max_bonds", rule.get("max_bonds", max(1, (particle.valence_target - particle.base_valence_electrons) // 2 or 1))))
+        if particle.bond_slots == 0 or not preserve_charge:
+            particle.bond_slots = particle.max_bond_slots
+
+        phase_meta = metadata.get("phase", rule.get("phase"))
         if isinstance(phase_meta, str):
             particle.phase = phase_meta.lower()
         elif not particle.phase:
@@ -420,6 +435,7 @@ class Simulation:
 
         self._apply_bond_forces()
         self._apply_angle_forces()
+        self._apply_capture_forces()
 
     def integrate(self, steps: int = 1) -> None:
         dt_fs = self.settings.timestep_fs
@@ -495,6 +511,9 @@ class Simulation:
                 element=particle.element,
                 position_nm=particle.position_nm,
                 velocity_nm_fs=particle.velocity_nm_fs,
+                valence_electrons=particle.valence_electrons,
+                bond_slots=self._bond_capacity(particle),
+                charge_e=particle.charge_e,
             )
             for particle in self.particles
         ]
@@ -525,6 +544,8 @@ class Simulation:
         for i, atom_a in enumerate(self.particles):
             for j in range(i + 1, len(self.particles)):
                 atom_b = self.particles[j]
+                if self._bond_capacity(atom_a) <= 0 or self._bond_capacity(atom_b) <= 0:
+                    continue
                 threshold_nm = self._bond_threshold_nm(atom_a.element, atom_b.element)
                 if threshold_nm is None:
                     continue
@@ -760,11 +781,43 @@ class Simulation:
 
         self._potential_energy += 0.5 * params.k_kj_mol_rad2 * deviation * deviation
 
+    def _apply_capture_forces(self) -> None:
+        for i, atom_a in enumerate(self.particles):
+            capacity_a = self._bond_capacity(atom_a)
+            if capacity_a <= 0:
+                continue
+            for j in range(i + 1, len(self.particles)):
+                atom_b = self.particles[j]
+                if self._bond_capacity(atom_b) <= 0:
+                    continue
+                if self._bond_exists(atom_a.id, atom_b.id):
+                    continue
+                threshold_nm = self._bond_threshold_nm(atom_a.element, atom_b.element)
+                if threshold_nm is None:
+                    continue
+                capture_radius = threshold_nm * BOND_CAPTURE_MULTIPLIER
+                delta = self._vector_between(atom_a.position_nm, atom_b.position_nm)
+                distance = vector_length(delta)
+                if distance == 0.0 or distance > capture_radius:
+                    continue
+                force_strength = CAPTURE_FORCE_K * (capture_radius - distance) / capture_radius
+                unit = vector_scale(delta, 1.0 / distance)
+                force = vector_scale(unit, force_strength)
+                atom_a.force_kjmol_nm = vector_add(atom_a.force_kjmol_nm, force)
+                atom_b.force_kjmol_nm = vector_sub(atom_b.force_kjmol_nm, force)
+
     def _vector_between(self, pos_a: Vector, pos_b: Vector) -> Vector:
         delta = vector_sub(pos_a, pos_b)
         if self.settings.periodic and self.settings.box_lengths_nm:
             delta = minimum_image(delta, self.settings.box_lengths_nm)
         return delta
+
+    def _bond_exists(self, atom_i: int, atom_j: int) -> bool:
+        pair = tuple(sorted((atom_i, atom_j)))
+        for bond in self.bonds:
+            if tuple(sorted((bond.atom_i, bond.atom_j))) == pair:
+                return True
+        return False
 
     def _form_bond(self, atom_a: Particle, atom_b: Particle, threshold_nm: float) -> Optional[BondState]:
         pair = tuple(sorted((atom_a.id, atom_b.id)))
@@ -777,9 +830,11 @@ class Simulation:
                 if donor.valence_electrons <= 0:
                     return None
                 donor.valence_electrons = max(0, donor.valence_electrons - 1)
+                donor.bond_slots = max(0, donor.bond_slots - 1)
                 donor.charge_e += 1.0
                 acceptor.valence_electrons += 1
                 acceptor.charge_e -= 1.0
+                acceptor.bond_slots = max(0, acceptor.bond_slots - 1)
                 transfer_direction = 1 if donor.id == pair[0] else -1
                 return BondState(
                     atom_i=pair[0],
@@ -800,6 +855,8 @@ class Simulation:
         shared_pairs = max(1, min(shared_pairs, 3))
         atom_a.valence_electrons = max(0, atom_a.valence_electrons - shared_pairs)
         atom_b.valence_electrons = max(0, atom_b.valence_electrons - shared_pairs)
+        atom_a.bond_slots = max(0, atom_a.bond_slots - shared_pairs)
+        atom_b.bond_slots = max(0, atom_b.bond_slots - shared_pairs)
         shared_electrons = shared_pairs * 2
         rest_length = self._covalent_rest_length(atom_a.element, atom_b.element, threshold_nm)
         return BondState(
@@ -827,6 +884,8 @@ class Simulation:
                 atom_j.valence_electrons = min(
                     atom_j.base_valence_electrons, atom_j.valence_electrons + to_restore
                 )
+                atom_i.bond_slots = min(atom_i.max_bond_slots, atom_i.bond_slots + int(bond.order))
+                atom_j.bond_slots = min(atom_j.max_bond_slots, atom_j.bond_slots + int(bond.order))
         elif bond.bond_type == "ionic" and bond.charge_transfer != 0:
             transfer = abs(bond.charge_transfer)
             if bond.charge_transfer > 0:
@@ -839,13 +898,13 @@ class Simulation:
             )
             donor.charge_e -= transfer
             acceptor.charge_e += transfer
+            donor.bond_slots = min(donor.max_bond_slots, donor.bond_slots + transfer)
+            acceptor.bond_slots = min(acceptor.max_bond_slots, acceptor.bond_slots + transfer)
 
     def _bond_capacity(self, atom: Particle) -> int:
-        base = atom.base_valence_electrons or atom.valence_electrons or 1
-        if atom.element == "H":
-            base_capacity = 1
-        else:
-            base_capacity = max(1, min(4, max(0, 8 - base)))
+        base_capacity = atom.bond_slots
+        if base_capacity <= 0:
+            base_capacity = 0
         used = sum(
             int(bond.order)
             for bond in self.bonds

@@ -175,6 +175,8 @@ class UIController:
         }
         if valence is not None:
             info["Valence electrons"] = str(valence)
+        info["Remaining bond slots"] = str(atom.bond_slots)
+        info["Charge (e)"] = f"{atom.charge_e:+.2f}"
         if configuration:
             info["Electron config"] = configuration
             info["Frontier shell"] = shell_excerpt

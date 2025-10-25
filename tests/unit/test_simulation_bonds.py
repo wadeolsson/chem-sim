@@ -141,3 +141,37 @@ def test_double_bond_allocation() -> None:
     oxygen_a, oxygen_b = sim.particles
     assert oxygen_a.valence_electrons == 4
     assert oxygen_b.valence_electrons == 4
+
+
+def test_water_formation_slots() -> None:
+    particles = [
+        Particle(
+            id=1,
+            element="O",
+            mass_amu=15.999,
+            charge_e=0.0,
+            position_nm=(0.0, 0.0, 0.0),
+            velocity_nm_fs=(0.0, 0.0, 0.0),
+        ),
+        Particle(
+            id=2,
+            element="H",
+            mass_amu=1.008,
+            charge_e=0.0,
+            position_nm=(0.09, 0.0, 0.0),
+            velocity_nm_fs=(0.0, 0.0, 0.0),
+        ),
+        Particle(
+            id=3,
+            element="H",
+            mass_amu=1.008,
+            charge_e=0.0,
+            position_nm=(-0.09, 0.0, 0.0),
+            velocity_nm_fs=(0.0, 0.0, 0.0),
+        ),
+    ]
+    sim = create_simulation(particles)
+    sim._update_bonds()  # type: ignore[attr-defined]
+    assert len(sim.bonds) == 2
+    oxygen = sim.particles[0]
+    assert oxygen.bond_slots == 0

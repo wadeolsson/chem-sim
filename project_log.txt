@@ -69,3 +69,7 @@ Notes: Begin sourcing parameter sets (GAFF/OPLS/ReaxFF) and wire charge equilibr
 v0.18 - Phase 1 Scenario Loader & Rendering
 Summary: Added YAML config loader (`src/config_loader.py`), sample presets (`config/presets/*`), UI scenario cycling/reset controls, ionic dashed-line rendering, and config-loader tests; simulations now start from curated presets with proper bonded visuals.
 Notes: Extend preset library, hook loaders into save/export flow, and begin parameter ingestion for broader element coverage.
+
+v0.19 - Valence-Driven Bonding Pass
+Summary: Introduced element valence metadata (`src/chem_data.py`), valence/bond-slot tracking in `sim.py`, capture forces, and enhanced inspector readouts; bonding logic now aggressively fills duet/octet targets and water forms naturally from H+H+O. README updated accordingly with tests extended.
+Notes: Next tackle neighbor lists and UI temperature/pressure sliders to modulate the thermostat/barostat in real time.

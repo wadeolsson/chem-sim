@@ -4,7 +4,7 @@ ChemSim is an ambitious chemistry sandbox that grows from classical molecular dy
 
 ## Current Capabilities
 - **Tier‑1 classical MD core** with velocity‑Verlet integration, Lennard‑Jones/Coulomb nonbonded forces, harmonic bond & angle terms, and Berendsen‑style thermostatting/phase heuristics.
-- **Reactive bonding heuristics** that classify covalent/ionic interactions, share or transfer valence electrons, and render bond order (single/double/triple) directly in the viewport.
+- **Valence-driven bonding heuristics** that aggressively seek duet/octet completion, classify covalent vs ionic interactions, transfer/share electrons, and render bond order (single/double/triple) directly in the viewport.
 - **Scenario presets & loader** (`config/presets/*.yaml`) describing atoms, force‑field parameters, and simulation settings (temperature, timestep, etc.) so the sandbox boots into meaningful states.
 - **pygame sandbox UI** featuring drag‑and‑drop atom placement, inspector readouts (valence, orbitals, speed), control dock with play/pause/step/speed controls, and scenario cycling.
 - **Data & docs** scaffolding: periodic table metadata, bonding research notes, roadmap, setup instructions, and critical test checklist.

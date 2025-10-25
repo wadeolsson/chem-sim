@@ -8,6 +8,7 @@ Tier 1 – Classical Dynamics
 - `test_distance_based_bond_detection`: validate that covalent bond heuristics flag/clear bonds correctly when atom separations cross threshold limits.
 - `test_ionic_charge_transfer`: confirm metal → nonmetal proximity triggers electron donation and resulting charge adjustments.
 - `test_bonded_force_terms`: exercise harmonic bond/angle forces to ensure molecules relax toward equilibrium geometries without instability.
+- `test_water_formation_slots`: confirm valence-slot accounting bonds two hydrogens to oxygen and satisfies octet targets.
 
 Tier 2 – Quantum-Inspired Bonding
 - `test_orbital_overlap_bonding_rules`: position diatomic species (e.g., H2, CO); confirm bond order, length, and energy match expected approximations from orbital overlap logic.
