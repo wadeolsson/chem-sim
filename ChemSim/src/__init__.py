@@ -1,1 +1,0 @@
-"""ChemSim source package placeholder."""

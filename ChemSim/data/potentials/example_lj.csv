@@ -1,4 +1,0 @@
-family,element_i,element_j,epsilon_kj_mol,sigma_angstrom,cutoff_angstrom,source,notes
-UFF-1992,H,H,0.184,2.29,10.0,"Rappé et al., J. Am. Chem. Soc. 114, 10024 (1992)","Converted from UFF epsilon=0.044 kcal/mol; sigma derived from r*."
-UFF-1992,O,O,0.251,3.12,12.0,"Rappé et al., J. Am. Chem. Soc. 114, 10024 (1992)","Converted from UFF epsilon=0.060 kcal/mol; sigma derived from r*."
-UFF-1992,H,O,0.215,2.70,11.0,"Lorentz-Berthelot mixing of UFF parameters","Computed via arithmetic mean of sigma and geometric mean of epsilon."
